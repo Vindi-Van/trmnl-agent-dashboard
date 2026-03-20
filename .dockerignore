@@ -1,0 +1,41 @@
+# Git
+.git
+.gitignore
+
+# Environment / secrets
+.env
+.env.*
+
+# Python caches
+__pycache__
+*.py[cod]
+*.egg-info
+
+# Tests (not needed in prod image)
+tests/
+trmnl/tests/
+.pytest_cache
+
+# Dev dependencies
+requirements-dev.txt
+
+# Docs
+docs/
+*.md
+LICENSE
+
+# IDE
+.vscode/
+.idea/
+
+# Data (mounted at runtime)
+data/
+
+# Infra scripts
+infra/
+
+# TRMNL templates (not needed in container)
+trmnl/
+
+# Agents config
+.agents/

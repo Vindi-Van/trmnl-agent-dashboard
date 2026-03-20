@@ -56,6 +56,23 @@ class Settings(BaseSettings):
     agent_tokens: str = "{}"
     trmnl_read_token: str = ""
 
+    @field_validator("trmnl_read_token", mode="before")
+    @classmethod
+    def strip_read_token(cls, v: Any) -> str:
+        """
+        Strip whitespace from the read token.
+
+        Secret Manager values may include trailing newlines
+        added by shell piping.
+
+        Args:
+            v: Raw value from environment.
+
+        Returns:
+            Trimmed token string.
+        """
+        return v.strip() if isinstance(v, str) else v
+
     # Database
     database_url: str = "sqlite:///data/status.db"
 
@@ -79,6 +96,7 @@ class Settings(BaseSettings):
             ValueError: If the value is not valid JSON.
         """
         if isinstance(v, str):
+            v = v.strip()
             try:
                 json.loads(v)
             except json.JSONDecodeError as e:
