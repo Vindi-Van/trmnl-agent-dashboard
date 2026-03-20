@@ -1,0 +1,166 @@
+<!--
+  OpenClaw Agent Status Board — Upgrade View
+  TRMNL Private Plugin (Full Layout)
+
+  Same adaptive card grid as base_view, but each card
+  includes an emoji avatar representing the agent's current mood.
+  Agents send `emoji` in their status payload.
+-->
+
+<div class="view view--full">
+  <div class="layout layout--col">
+
+    <!-- ─── Summary bar ─── -->
+    <div class="flex flex--row" style="justify-content: space-between; align-items: center; padding: 0 4px 8px 4px; border-bottom: 2px solid black;">
+      <span class="title title--base">OpenClaw Fleet</span>
+      <div class="flex flex--row" style="gap: 12px; align-items: center;">
+        {% if summary.active > 0 %}
+          <span class="label label--inverted" style="padding: 2px 8px;">{{ summary.active }} active</span>
+        {% endif %}
+        {% if summary.blocked > 0 %}
+          <span class="label label--outline" style="padding: 2px 8px;">{{ summary.blocked }} blocked</span>
+        {% endif %}
+        {% if summary.idle > 0 %}
+          <span class="label label--gray">{{ summary.idle }} idle</span>
+        {% endif %}
+        {% if summary.stale > 0 %}
+          <span class="label label--gray">{{ summary.stale }} stale</span>
+        {% endif %}
+        {% if summary.error > 0 %}
+          <span class="label label--inverted" style="padding: 2px 8px;">{{ summary.error }} error</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ─── Agent cards ─── -->
+
+    {% assign count = agents | size %}
+
+    <!-- 1 agent: single full-width card -->
+    {% if count == 1 %}
+    <div class="flex flex--col" style="flex: 1; justify-content: center; padding: 16px 8px;">
+      {% for agent in agents %}
+        {% include 'agent_card_upgrade' %}
+      {% endfor %}
+    </div>
+
+    <!-- 2 agents: side by side -->
+    {% elsif count == 2 %}
+    <div class="grid grid--cols-2" style="flex: 1; align-items: stretch; gap: 12px; padding: 12px 4px;">
+      {% for agent in agents %}
+      <div class="col" style="border: 1px solid black; border-radius: 4px; padding: 12px;">
+        {% include 'agent_card_upgrade' %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- 3 agents: three columns -->
+    {% elsif count == 3 %}
+    <div class="grid grid--cols-3" style="flex: 1; align-items: stretch; gap: 8px; padding: 12px 4px;">
+      {% for agent in agents %}
+      <div class="col" style="border: 1px solid black; border-radius: 4px; padding: 10px;">
+        {% include 'agent_card_upgrade' %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- 4 agents: 2×2 grid -->
+    {% elsif count == 4 %}
+    <div class="grid grid--cols-2" style="flex: 1; align-items: stretch; gap: 8px; padding: 8px 4px;">
+      {% for agent in agents %}
+      <div class="col" style="border: 1px solid black; border-radius: 4px; padding: 10px;">
+        {% include 'agent_card_upgrade' %}
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- 5 agents: 3 top + 2 bottom -->
+    {% elsif count == 5 %}
+    <div class="grid grid--cols-3" style="flex: 1; align-items: stretch; gap: 6px; padding: 6px 4px;">
+      {% for agent in agents %}
+        {% if forloop.index <= 3 %}
+        <div class="col" style="border: 1px solid black; border-radius: 4px; padding: 8px;">
+          {% include 'agent_card_upgrade' %}
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="grid grid--cols-2" style="flex: 1; align-items: stretch; gap: 6px; padding: 0 4px 6px 4px;">
+      {% for agent in agents %}
+        {% if forloop.index > 3 %}
+        <div class="col" style="border: 1px solid black; border-radius: 4px; padding: 8px;">
+          {% include 'agent_card_upgrade' %}
+        </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- 6 agents: 3×2 grid -->
+    {% elsif count >= 6 %}
+    <div class="grid grid--cols-3" style="flex: 1; align-items: stretch; gap: 6px; padding: 6px 4px;">
+      {% for agent in agents limit: 6 %}
+      <div class="col" style="border: 1px solid black; border-radius: 4px; padding: 8px;">
+        {% include 'agent_card_upgrade' %}
+      </div>
+      {% endfor %}
+    </div>
+
+    {% endif %}
+
+  </div>
+
+  <!-- ─── Title bar ─── -->
+  <div class="title_bar">
+    <span class="title">Agent Status Board</span>
+    <span class="instance">{{ generated_at | date: "%H:%M" }} UTC</span>
+  </div>
+</div>
+
+<!--
+  ═══════════════════════════════════════════════
+  INLINE PARTIAL: agent_card_upgrade
+
+  Since TRMNL's inline editor doesn't support
+  separate partial files, paste the card markup
+  below directly in place of each
+  {% include 'agent_card_upgrade' %} above.
+  ═══════════════════════════════════════════════
+
+  ┌──────────────────────────────────────────────┐
+  │ Card markup to substitute for each include:  │
+  └──────────────────────────────────────────────┘
+-->
+
+<!--
+  AGENT CARD — UPGRADE (copy this block for each {% include %})
+
+  <div class="flex flex--col" style="gap: 4px;">
+
+    <div class="flex flex--row" style="gap: 8px; align-items: center;">
+      <span style="font-size: 24px; line-height: 1;">{{ agent.emoji | default: "🤖" }}</span>
+      <span class="title title--small" data-clamp="1">{{ agent.display_name }}</span>
+    </div>
+
+    {% if agent.state == "active" %}
+      <span class="label label--small label--inverted" style="align-self: flex-start; padding: 1px 6px;">● ACTIVE</span>
+    {% elsif agent.state == "blocked" %}
+      <span class="label label--small label--outline" style="align-self: flex-start; padding: 1px 6px;">◼ BLOCKED</span>
+    {% elsif agent.state == "idle" %}
+      <span class="label label--small label--gray" style="align-self: flex-start;">○ IDLE</span>
+    {% elsif agent.state == "error" %}
+      <span class="label label--small label--inverted" style="align-self: flex-start; padding: 1px 6px;">✕ ERROR</span>
+    {% elsif agent.state == "stale" %}
+      <span class="label label--small label--gray" style="align-self: flex-start;">◌ STALE</span>
+    {% else %}
+      <span class="label label--small label--gray" style="align-self: flex-start;">{{ agent.state | upcase }}</span>
+    {% endif %}
+
+    <span class="label" data-clamp="2">{{ agent.headline }}</span>
+
+    {% if agent.blocked_on %}
+      <span class="label label--small label--gray" data-clamp="1">↳ {{ agent.blocked_on }}</span>
+    {% endif %}
+
+    <span class="label label--small label--gray">{{ agent.minutes_ago }}m ago</span>
+  </div>
+-->
