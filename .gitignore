@@ -1,0 +1,48 @@
+# ─── Environment / Secrets ────────────────────────────────────
+.env
+.env.*
+!.env.example
+
+# ─── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+.eggs/
+
+# ─── Virtual environments ────────────────────────────────────
+venv/
+.venv/
+env/
+
+# ─── Database ─────────────────────────────────────────────────
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# ─── IDE ──────────────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── OS ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Test artifacts ───────────────────────────────────────────
+trmnl/tests/screenshots/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# ─── Playwright ───────────────────────────────────────────────
+test-results/
+
+# ─── Docker ───────────────────────────────────────────────────
+*.log
