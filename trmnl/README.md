@@ -1,7 +1,8 @@
 # TRMNL Plugin Templates
 
-This directory contains the Liquid markup templates for the OpenClaw Agent
-Status Board TRMNL Private Plugin.
+Liquid markup templates for the OpenClaw Agent Status Board TRMNL
+Private Plugin, with Playwright-based screenshot tests for visual
+verification.
 
 ## Templates
 
@@ -12,7 +13,7 @@ Status Board TRMNL Private Plugin.
 
 ## Layout Strategy
 
-The template renders agent status as **cards in a single full-screen view**,
+The template renders agent statuses as **cards in a single full-screen view**,
 using the TRMNL Grid system to adapt the layout based on agent count:
 
 | Agents | Layout |
@@ -27,23 +28,26 @@ using the TRMNL Grid system to adapt the layout based on agent count:
 ## Card Anatomy
 
 ### Base View
+
 ```
-┌─────────────────────┐
-│  AGENT NAME         │  ← title (bold)
-│  ● ACTIVE           │  ← state badge (label--inverted)
-│  Fixing iOS signing │  ← headline (label)
-│  12m ago            │  ← freshness (label--gray)
-└─────────────────────┘
+┌─────────────────────────┐
+│  AGENT NAME             │  ← title (bold)
+│  ● ACTIVE               │  ← state badge (inverted/outline)
+│  Fixing iOS signing     │  ← headline (label)
+│  ↳ cert rotation        │  ← blocked_on (if applicable)
+│  12m ago                │  ← freshness (gray)
+└─────────────────────────┘
 ```
 
 ### Upgrade View
+
 ```
-┌─────────────────────┐
-│  🔥  AGENT NAME     │  ← emoji avatar + title
-│  ● ACTIVE           │  ← state badge
-│  Fixing iOS signing │  ← headline
-│  12m ago            │  ← freshness
-└─────────────────────┘
+┌─────────────────────────┐
+│  🔥  AGENT NAME         │  ← emoji avatar + title
+│  ● ACTIVE               │  ← state badge
+│  Fixing iOS signing     │  ← headline
+│  12m ago                │  ← freshness
+└─────────────────────────┘
 ```
 
 ## TRMNL Plugin Setup
@@ -57,17 +61,68 @@ using the TRMNL Grid system to adapt the layout based on agent count:
 6. Set poll interval to **15 minutes**
 7. Add the plugin to your device playlist
 
+> **Note**: The templates use `{% include %}` tags as documentation markers.
+> Before pasting into TRMNL, expand each include with the inline card markup
+> shown at the bottom of each template file. TRMNL's editor does not support
+> separate partial files.
+
 ## Data Contract
 
-The templates expect the JSON response shape documented in
-[ARCHITECTURE.md](../docs/ARCHITECTURE.md#5-api-design) — specifically the
-`summary` object and `agents` array from `GET /api/v1/trmnl/openclaw`.
+The templates expect the JSON response from `GET /api/v1/trmnl/openclaw`:
 
-### Required Fields per Agent
+```json
+{
+  "generated_at": "2026-03-20T07:30:00Z",
+  "summary": {
+    "total": 3,
+    "active": 1,
+    "blocked": 1,
+    "idle": 1,
+    "error": 0,
+    "stale": 0
+  },
+  "agents": [
+    {
+      "display_name": "Matrim",
+      "state": "active",
+      "headline": "Fixing Expo iOS simulator signing",
+      "emoji": "🔥",
+      "blocked_on": null,
+      "minutes_ago": 5,
+      "is_stale": false
+    }
+  ]
+}
+```
 
-- `display_name` — agent name
-- `state` — one of: `active`, `blocked`, `idle`, `error`, `stale`
-- `headline` — one-line task summary
-- `minutes_ago` — computed freshness
-- `is_stale` — boolean
-- `emoji` — mood emoji (upgrade view only)
+## Screenshot Tests
+
+Playwright-based tests render both templates with mock data for 1–6 agents and
+capture PNGs at 800×480 (TRMNL OG resolution).
+
+### Running Tests
+
+```bash
+# Install (one-time)
+pip install -r requirements-dev.txt
+python -m playwright install chromium
+
+# Run
+python -m pytest trmnl/tests/test_screenshots.py -v
+
+# View results
+start trmnl/tests/screenshots/index.html
+```
+
+### Test Files
+
+| File | Purpose |
+|---|---|
+| `tests/mock_data.py` | 6 scenarios with Wheel of Time themed agents |
+| `tests/render_templates.py` | Liquid renderer + CSS fallbacks for offline rendering |
+| `tests/conftest.py` | Screenshot directory fixture |
+| `tests/test_screenshots.py` | 13 parametrized tests + gallery index |
+
+The tests generate 12 PNGs (base + upgrade × 6 scenarios) and an HTML gallery
+page for side-by-side visual review. They always pass — they exist for visual
+verification, not pixel-diff comparison.
