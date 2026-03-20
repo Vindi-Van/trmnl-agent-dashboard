@@ -35,7 +35,7 @@ cp .env.example .env
 | Variable | Description | Example |
 |---|---|---|
 | `AGENT_TOKENS` | JSON map of bearer tokens → agent identities | `{"token1": {"agent_id": "matrim", "display_name": "Matrim Cauthon"}}` |
-| `TRMNL_READ_TOKEN` | Bearer token for the TRMNL read endpoint | `IIj20WOBz7cZ...` |
+| `TRMNL_READ_TOKEN` | Bearer token for the TRMNL read endpoint | `your-read-token-here` |
 | `DATABASE_URL` | SQLite database path | `sqlite:///data/status.db` |
 | `GCP_PROJECT` | GCP project ID (for deployment) | `my-project-123` |
 | `GCP_REGION` | GCP region (for deployment) | `us-west1` |
